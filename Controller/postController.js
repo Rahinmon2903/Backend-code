@@ -3,10 +3,11 @@ import Post from "../Model/postSchema.js";
 
 //create post
 
+
 export const  createPost=async (req,res) => {
     try {
         const {title,description}=req.body;
-        const imageURL="";
+        let imageURL="";
         if(req.file && req.file.path){
             imageURL=req.file.path
 
