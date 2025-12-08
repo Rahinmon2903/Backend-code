@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import dbConnect from "./database/dbConfig.js";
 import userRouter from "./Router/userRouter.js";
+import route from "./Router/postRouter.js";
 
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.get("/",(req,res)=>{
     res.status(200).send("welcome to api")
 })
 app.use("/api/auth",userRouter)
+app,use("/api/post",route)
 
 
 
