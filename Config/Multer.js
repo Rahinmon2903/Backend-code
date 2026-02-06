@@ -1,17 +1,15 @@
 import multer from "multer";
-import cloudinary from "./Cloudinary.js";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "./Cloudinary.js";
 
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: "bloggify",
-        format:["jpg","png","jpeg"],
-    },
+  cloudinary,
+  params: {
+    folder: "bloggify",
+    allowed_formats: ["jpg", "png", "jpeg"],
+  },
 });
 
-const upload=multer({storage:storage});
+const upload = multer({ storage });
 
 export default upload;
-
-//multer is used to upload files and for storage and cloudinary is used to convert the upload image to an url
