@@ -57,58 +57,71 @@ export const loginUser = async (req, res) => {
 };
 
 export const forgetpassword = async (req, res) => {
-    try {
-       
-        const { email} = req.body;
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "invalid email" });
-        }
-        const token = jwt.sign(
-            { _id: user._id },
-            process.env.SECRET_KEY,
-            { expiresIn: "1d" }
-        );
+  try {
+    const { email } = req.body;
 
-        await sendEmail(
-            user.email,
-            "Reset Password",
-            `http://localhost:5173/reset-password/${user._id}/${token}`
-        )
-       
-
-            
-            res.status(200).json({ message: "email sent" });
-        }
-     catch (error) {
-          
- 
-        res.status(500).json({ message: "Error in reset password" });
+    // 1️⃣ Validate input
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
     }
+
+    // 2️⃣ Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 3️⃣ Generate token
+    const token = jwt.sign(
+      { _id: user._id },
+      process.env.SECRET_KEY,
+      { expiresIn: "1d" }
+    );
+
+    const resetLink = `http://localhost:5173/reset-password/${user._id}/${token}`;
+
+    // 4️⃣ Send email
+    await sendEmail(
+      user.email,
+      "Reset Password",
+      resetLink
+    );
+
+    res.status(200).json({ message: "Reset email sent" });
+
+  } catch (error) {
+    console.error("FORGOT PASSWORD ERROR:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
+export const updatePassword = async (req, res) => {
+  try {
+    const { id, token } = req.params;
+    const { password } = req.body;
 
-export const updatePassword=async (req,res) => {
-    const {id,token} =req.params;
-    const {password}=req.body;
-    const user= await User.findById(id);
-    if(!user){
-        return res.status(400).json({message:"user not found"});
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
     }
-    try {
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-        if (!decodedToken) {
-            return res.status(400).json({ message: "Invalid token" });
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const updatePassword=await User.findByIdAndUpdate(id,{password:hashedPassword},{new:true});
 
-       
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
-        res.status(200).json({ message: "Password updated successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Error in updating password" });
+    const hashedPassword = await bcrypt.hash(password, 10);
 
+    const user = await User.findByIdAndUpdate(
+      id,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-    
-}
+
+    res.status(200).json({ message: "Password updated successfully" });
+
+  } catch (error) {
+    console.error("UPDATE PASSWORD ERROR:", error);
+    res.status(500).json({ message: "Invalid or expired token" });
+  }
+};
