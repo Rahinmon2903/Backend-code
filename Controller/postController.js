@@ -55,8 +55,8 @@ export const getAllUnapprovedPost=async (req,res) => {
 
 export const ApprovePost=async (req,res) => {
     try {
-        const post=await User.findByIdAndUpdate(
-            req.params._id,
+        const post=await Post.findByIdAndUpdate(
+            req.params.id,
             {approved:true},
             {new:true}
         )
@@ -76,7 +76,7 @@ export const ApprovePost=async (req,res) => {
 
 export const deletePost=async (req,res) => {
     try {
-    await Post.findByIdAndDelete(req.params._id);
+    await Post.findByIdAndDelete(req.params.id);
         res.status(200).json({
             message:"post deleted successfully"
            

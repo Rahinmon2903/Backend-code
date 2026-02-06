@@ -41,7 +41,7 @@ export const loginUser = async (req, res) => {
         } else {
             const token = jwt.sign(
                 { _id: user._id },
-                process.env.SECERT_KEY,
+                process.env.SECRET_KEY,
                 { expiresIn: "1d" }
             );
 
@@ -66,7 +66,7 @@ export const forgetpassword = async (req, res) => {
         }
         const token = jwt.sign(
             { _id: user._id },
-            process.env.SECERT_KEY,
+            process.env.SECRET_KEY,
             { expiresIn: "1d" }
         );
 
@@ -96,7 +96,7 @@ export const updatePassword=async (req,res) => {
         return res.status(400).json({message:"user not found"});
     }
     try {
-        const decodedToken = jwt.verify(token, process.env.SECERT_KEY);
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
         if (!decodedToken) {
             return res.status(400).json({ message: "Invalid token" });
         }

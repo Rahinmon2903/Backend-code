@@ -21,7 +21,7 @@ export const authMiddleware = async (req, res, next) => {
     try {
         // Verify the token using the secret key.
         // If valid, this returns the payload stored inside the token (including _id).
-        const tokendecode = jwt.verify(token, process.env.SECERT_KEY);
+        const tokendecode = jwt.verify(token, process.env.SECRET_KEY);
 
         // Using the _id from the decoded token, find the user in the database.
         // .select("-password") removes the password field from the result.
